@@ -12,7 +12,8 @@ class UserRequest extends FormRequest
         'contact',
         'date_of_birth',
         'gender',
-        'address'
+        'address',
+        'role'
     ];
 
     public const ADMIN_FIELDS = [
@@ -37,6 +38,7 @@ class UserRequest extends FormRequest
             'date_of_birth' => ['nullable', 'date'],
             'gender' => ['nullable', 'in:male,female,other'],
             'address' => ['nullable', 'string'],
+            'role' => ['sometimes', 'required', 'in:patient,doctor'],
         ];
 
         if ($isAdminRoute && $this->isMethod('POST')) {
@@ -57,7 +59,7 @@ class UserRequest extends FormRequest
             'password.required' => 'Password is required',
             'password.min' => 'Password must be at least 8 characters',
             'role.required' => 'Role is required',
-            'role.in' => 'Invalid role selected',
+            'role.in' => 'Role must be either patient or doctor',
             'gender.in' => 'Invalid gender selected',
         ];
     }

@@ -20,6 +20,9 @@ class UserService
             $data['password'] = Hash::make($data['password']);
         }
         
+        // Ensure role is set
+        $data['role'] = $data['role'] ?? 'patient';
+        
         return User::create($data);
     }
 
@@ -35,8 +38,12 @@ class UserService
 
     public function updateProfile(User $user, array $data)
     {
-        return $user->update(array_filter($data, fn($value) => 
-            $value !== null && $value !== ''
-        ));
+        // Filter out empty values but keep role even if it's the same
+        $filteredData = array_filter($data, function($value, $key) {
+            if ($key === 'role') return true;
+            return $value !== null && $value !== '';
+        }, ARRAY_FILTER_USE_BOTH);
+        
+        return $user->update($filteredData);
     }
 }

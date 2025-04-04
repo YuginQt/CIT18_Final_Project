@@ -34,5 +34,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::put('/{appointment}', [BookingController::class, 'update'])
             ->name('appointments.update');
         Route::put('/{appointment}/cancel', [BookingController::class, 'cancel'])->name('appointments.cancel');
+        Route::put('/{appointment}/approve', [BookingController::class, 'approve'])
+            ->name('appointments.approve');
     });
 });

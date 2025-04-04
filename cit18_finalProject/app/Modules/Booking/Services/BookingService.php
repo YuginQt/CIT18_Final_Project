@@ -45,6 +45,31 @@ class BookingService
 
     public function cancelAppointment(Appointment $appointment)
     {
-        return $appointment->update(['status' => 'cancelled']);
+        try {
+            $appointment->update(['status' => 'cancelled']);
+            
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function approveAppointment(Appointment $appointment)
+    {
+        try {
+            $appointment->update([
+                'status' => 'confirmed'
+            ]);
+            
+            return [
+                'success' => true,
+                'message' => 'Appointment approved successfully'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to approve appointment'
+            ];
+        }
     }
 }

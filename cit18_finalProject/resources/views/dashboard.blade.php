@@ -9,34 +9,27 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Quick Action Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="text-center">
-                        <i class="fas fa-calendar-plus text-4xl text-indigo-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">Book Appointment</h3>
-                        <a href="{{ route('appointments.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                            Schedule Now
-                        </a>
+                @if(Auth::user()->role !== 'doctor')
+                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                        <div class="text-center">
+                            <i class="fas fa-calendar-plus text-4xl text-indigo-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold mb-2">Book Appointment</h3>
+                            <a href="{{ route('appointments.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                Schedule Now
+                            </a>
+                        </div>
                     </div>
-                </div>
-                {{-- <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="text-center">
-                        <i class="fas fa-comments text-4xl text-green-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">Message Doctor</h3>
-                        <button class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                            Start Chat
-                        </button>
+                    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                        <div class="text-center">
+                            <i class="fas fa-file-medical text-4xl text-blue-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold mb-2">Appointment History</h3>
+                            <button onclick="openAppointmentModal()" 
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                View History
+                            </button>
+                        </div>
                     </div>
-                </div> --}}
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="text-center">
-                        <i class="fas fa-file-medical text-4xl text-blue-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">Appointment History</h3>
-                        <button onclick="openAppointmentModal()" 
-                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            View History
-                        </button>
-                    </div>
-                </div>
+                @endif
             </div>
 
             <!-- Profile Information -->
@@ -66,16 +59,6 @@
                         <p class="text-sm text-gray-600 mt-4">Address</p>
                         <p class="font-medium">{{ Auth::user()->address ?? 'Not set' }}</p>
 
-                        @if(Auth::user()->role === 'doctor')
-                            <p class="text-sm text-gray-600 mt-4">Specialization</p>
-                            <p class="font-medium">{{ Auth::user()->specialization ?? 'Not set' }}</p>
-
-                            <p class="text-sm text-gray-600 mt-4">License Number</p>
-                            <p class="font-medium">{{ Auth::user()->license_number ?? 'Not set' }}</p>
-
-                            <p class="text-sm text-gray-600 mt-4">Availability</p>
-                            <p class="font-medium">{{ Auth::user()->is_available ? 'Available' : 'Not Available' }}</p>
-                        @endif
                     </div>
                 </div>
 
@@ -145,18 +128,6 @@
                         </div>
                     </form>
                 </div>
-
-                @if (session('success'))
-                    <div class="mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-md">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded-md">
-                        {{ session('error') }}
-                    </div>
-                @endif
             </div>
 
             <!-- Upcoming Appointments -->
@@ -202,15 +173,30 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            @if($appointment->user_id === auth()->id() && $appointment->status !== 'cancelled')
-                                                <button onclick="rescheduleAppointment({{ $appointment->id }})" 
-                                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
-                                                    Reschedule
-                                                </button>
-                                                <button onclick="cancelAppointment({{ $appointment->id }})" 
-                                                    class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
-                                                    Cancel
-                                                </button>
+                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'confirmed')
+                                                @if(Auth::user()->role === 'doctor')
+                                                    @if($appointment->status === 'pending' && $appointment->doctor_id === Auth::id())
+                                                        <button onclick="approveAppointment({{ $appointment->id }})" 
+                                                            class="text-green-600 hover:text-green-900 bg-green-100 px-3 py-1 rounded-md">
+                                                            Approve
+                                                        </button>
+                                                        <button onclick="cancelAppointment({{ $appointment->id }})" 
+                                                            class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
+                                                            Cancel
+                                                        </button>
+                                                    @endif
+                                                @else
+                                                    @if($appointment->user_id === auth()->id())
+                                                        <button onclick="rescheduleAppointment({{ $appointment->id }})" 
+                                                            class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
+                                                            Reschedule
+                                                        </button>
+                                                        <button onclick="cancelAppointment({{ $appointment->id }})" 
+                                                            class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
+                                                            Cancel
+                                                        </button>
+                                                    @endif
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>
@@ -288,8 +274,8 @@
 
     <!-- Cancellation Confirmation Modal -->
     <div id="cancel-modal" 
-         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Cancel Appointment</h3>
                 <div class="mt-2 px-7 py-3">
@@ -305,6 +291,60 @@
                     <button onclick="closeCancelModal()" 
                             class="ml-2 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
                         No, Keep it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" 
+         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4" id="error-modal-title">Error</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500" id="error-modal-message"></p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="error-modal-close" 
+                            class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this confirmation modal HTML alongside your error modal -->
+    <div id="confirm-modal" 
+         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Confirm Approval</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Are you sure you want to approve this appointment?
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="confirm-approve" 
+                            class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2">
+                        Approve
+                    </button>
+                    <button onclick="closeConfirmModal()" 
+                            class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -384,14 +424,23 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        Toastify({
+                            text: data.message,
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#10B981",
+                            stopOnFocus: true,
+                        }).showToast();
+                        
                         window.location.reload();
                     } else {
-                        alert(data.message || 'Failed to cancel appointment.');
+                        showErrorModal(data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while cancelling the appointment.');
+                    showErrorModal('An error occurred while cancelling the appointment.');
                 });
             }
             closeCancelModal();
@@ -410,5 +459,111 @@
                 closeCancelModal();
             }
         });
+
+        function showErrorModal(message) {
+            document.getElementById('error-modal-message').textContent = message;
+            document.getElementById('error-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeErrorModal() {
+            document.getElementById('error-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Add event listener for the close button
+        document.getElementById('error-modal-close').addEventListener('click', closeErrorModal);
+
+        // Close modal when clicking outside
+        document.getElementById('error-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeErrorModal();
+            }
+        });
+
+        // Close modal on escape key press
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeErrorModal();
+            }
+        });
+
+        let appointmentToApprove = null;
+
+        function showConfirmModal(appointmentId) {
+            appointmentToApprove = appointmentId;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            appointmentToApprove = null;
+        }
+
+        // Add event listeners for the confirm modal
+        document.getElementById('confirm-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfirmModal();
+            }
+        });
+
+        document.getElementById('confirm-approve').addEventListener('click', function() {
+            if (appointmentToApprove) {
+                processApproval(appointmentToApprove);
+            }
+            closeConfirmModal();
+        });
+
+        function approveAppointment(appointmentId) {
+            showConfirmModal(appointmentId);
+        }
+
+        function processApproval(appointmentId) {
+            fetch(`/appointments/${appointmentId}/approve`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#10B981",
+                        stopOnFocus: true,
+                    }).showToast();
+                    
+                    window.location.reload();
+                } else {
+                    showErrorModal(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorModal("An error occurred while approving the appointment");
+            });
+        }
     </script>
+
+    @if (session('success') || session('error'))
+        <script>
+            Toastify({
+                text: "{{ session('success') ?? session('error') }}",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "{{ session('success') ? '#10B981' : '#EF4444' }}",
+                stopOnFocus: true,
+                onClick: function(){} // Prevents errors if accidentally clicked
+            }).showToast();
+        </script>
+    @endif
 </x-app-layout>

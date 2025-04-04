@@ -9,7 +9,30 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
-            <input type="hidden" name="role" value="patient">
+            @if ($errors->any())
+                <div class="mb-4">
+                    <div class="font-medium text-red-600">{{ __('Whoops! Something went wrong.') }}</div>
+                    <ul class="mt-3 list-disc list-inside text-sm text-red-600">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="mt-4">
+                <x-label value="{{ __('Register as') }}" />
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input type="radio" id="role_patient" name="role" value="patient" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" {{ old('role', 'patient') === 'patient' ? 'checked' : '' }}>
+                        <label for="role_patient" class="ml-2 block text-sm text-gray-900">Patient</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="role_doctor" name="role" value="doctor" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" {{ old('role') === 'doctor' ? 'checked' : '' }}>
+                        <label for="role_doctor" class="ml-2 block text-sm text-gray-900">Doctor</label>
+                    </div>
+                </div>
+            </div>
 
             <div>
                 <x-label for="name" value="{{ __('Name') }}" />
