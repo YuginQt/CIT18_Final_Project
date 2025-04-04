@@ -28,10 +28,6 @@ Route::middleware([
         Route::put('/user/update-profile', [UserController::class, 'updateProfile'])->name('user.update-profile');
     });
 
-    Route::get('/book-appointment', function () {
-        return view('booking.book-appointment');
-    });
-
     // Appointment routes
     Route::prefix('appointments')->group(function () {
         Route::get('/create', [BookingController::class, 'create'])->name('appointments.create');

@@ -74,18 +74,6 @@ class User extends Authenticatable
         'is_available' => 'boolean',
     ];
 
-    // Relationship with Patient
-    public function patient()
-    {
-        return $this->hasOne(Patient::class);
-    }
-
-    // Relationship with Doctor
-    public function doctor()
-    {
-        return $this->hasOne(Doctor::class);
-    }
-
     public function isPatient()
     {
         return $this->role === 'patient';

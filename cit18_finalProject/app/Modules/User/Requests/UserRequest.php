@@ -6,6 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
 {
+    public const PROFILE_FIELDS = [
+        'name',
+        'email',
+        'contact',
+        'date_of_birth',
+        'gender',
+        'address'
+    ];
+
+    public const ADMIN_FIELDS = [
+        'role',
+        'password'
+    ];
+
     public function authorize()
     {
         return true;
@@ -13,9 +27,10 @@ class UserRequest extends FormRequest
 
     public function rules()
     {
-        $userId = auth()->id();
+        $userId = $this->route('user')?->id ?? auth()->id();
+        $isAdminRoute = $this->is('admin/*');
         
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $userId],
             'contact' => ['nullable', 'string', 'max:255'],
@@ -23,6 +38,13 @@ class UserRequest extends FormRequest
             'gender' => ['nullable', 'in:male,female,other'],
             'address' => ['nullable', 'string'],
         ];
+
+        if ($isAdminRoute && $this->isMethod('POST')) {
+            $rules['password'] = ['required', 'string', 'min:8'];
+            $rules['role'] = ['required', 'in:admin,user'];
+        }
+
+        return $rules;
     }
 
     public function messages()
@@ -38,5 +60,16 @@ class UserRequest extends FormRequest
             'role.in' => 'Invalid role selected',
             'gender.in' => 'Invalid gender selected',
         ];
+    }
+
+    public function validatedFields(): array
+    {
+        $fields = self::PROFILE_FIELDS;
+        
+        if ($this->is('admin/*')) {
+            $fields = array_merge($fields, self::ADMIN_FIELDS);
+        }
+
+        return $this->only($fields);
     }
 }

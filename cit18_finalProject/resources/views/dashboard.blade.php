@@ -13,7 +13,7 @@
                     <div class="text-center">
                         <i class="fas fa-calendar-plus text-4xl text-indigo-600 mb-4"></i>
                         <h3 class="text-lg font-semibold mb-2">Book Appointment</h3>
-                        <a href="/book-appointment" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <a href="{{ route('appointments.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                             Schedule Now
                         </a>
                     </div>
@@ -162,7 +162,6 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Upcoming Appointments</h3>
-                    <a href="{{ route('appointments.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900">View All</a>
                 </div>
                 
                 <div class="overflow-x-auto">

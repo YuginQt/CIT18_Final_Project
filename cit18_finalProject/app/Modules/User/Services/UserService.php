@@ -16,31 +16,16 @@ class UserService
 
     public function createUser(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => $data['role'],
-            'contact' => $data['contact'] ?? null,
-            'date_of_birth' => $data['date_of_birth'] ?? null,
-            'gender' => $data['gender'] ?? null,
-            'address' => $data['address'] ?? null,
-        ]);
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+        
+        return User::create($data);
     }
 
     public function updateUser(User $user, array $data)
     {
-        $user->update([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'role' => $data['role'],
-            'contact' => $data['contact'] ?? null,
-            'date_of_birth' => $data['date_of_birth'] ?? null,
-            'gender' => $data['gender'] ?? null,
-            'address' => $data['address'] ?? null,
-        ]);
-
-        return $user;
+        return $user->update($data);
     }
 
     public function deleteUser(User $user)
@@ -50,15 +35,8 @@ class UserService
 
     public function updateProfile(User $user, array $data)
     {
-        $updateData = array_filter([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'contact' => $data['contact'],
-            'date_of_birth' => $data['date_of_birth'],
-            'gender' => $data['gender'],
-            'address' => $data['address'],
-        ], fn($value) => $value !== null && $value !== '');
-
-        return $user->update($updateData);
+        return $user->update(array_filter($data, fn($value) => 
+            $value !== null && $value !== ''
+        ));
     }
 }
