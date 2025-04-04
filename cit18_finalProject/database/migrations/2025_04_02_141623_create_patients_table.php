@@ -10,17 +10,17 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-{
-    Schema::create('patients', function (Blueprint $table) {
-        $table->id();
-        $table->string('name');
-        $table->integer('age');
-        $table->string('gender');
-        $table->string('contact')->nullable();
-        $table->text('address')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('patients', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Link to users table
+            $table->integer('age');
+            $table->string('gender');
+            $table->string('contact')->nullable();
+            $table->text('address')->nullable();
+            $table->timestamps();
+        });
+    }
 
 
     /**
