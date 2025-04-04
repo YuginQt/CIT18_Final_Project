@@ -1,12 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Modules\Patient\Controllers\PatientController;
-
-Route::middleware(['auth'])->group(function () {
-    Route::resource('patients', PatientController::class);
-});
-
+use App\Modules\User\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +16,14 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::put('/patient/update-profile', [PatientController::class, 'updateProfile'])
-        ->name('patient.update-profile');
+    // User management routes
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/', [UserController::class, 'store'])->name('users.store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::put('/user/update-profile', [UserController::class, 'updateProfile'])->name('user.update-profile');
+    });
 });

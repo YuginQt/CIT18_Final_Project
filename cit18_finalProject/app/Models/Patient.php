@@ -8,10 +8,14 @@ class Patient extends Model
 {
     protected $fillable = [
         'user_id',
+        'contact',
+        'date_of_birth',
         'age',
         'gender',
-        'contact',
-        'address',
+        'address'
+    ];
+
+    protected $dates = [
         'date_of_birth'
     ];
 

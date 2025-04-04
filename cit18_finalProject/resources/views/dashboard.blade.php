@@ -1,82 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Patient Dashboard') }}
+            {{ __('Dashboard') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6 p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Personal Information</h3>
-                    <button onclick="toggleEditForm()" class="text-sm text-indigo-600 hover:text-indigo-900">
-                        <i class="fas fa-edit mr-1"></i> Edit Profile
-                    </button>
-                </div>
-                
-                <!-- Display Information -->
-                <div id="info-display" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <p class="text-sm text-gray-600">Name</p>
-                        <p class="font-medium">{{ Auth::user()->name }}</p>
-                        <p class="text-sm text-gray-600 mt-2">Email</p>
-                        <p class="font-medium">{{ Auth::user()->email }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Phone</p>
-                        <p class="font-medium">{{ Auth::user()->patient->contact ?? 'Not set' }}</p>
-                        <p class="text-sm text-gray-600 mt-2">Date of Birth</p>
-                        <p class="font-medium">{{ Auth::user()->patient->date_of_birth ?? 'Not set' }}</p>
-                    </div>
-                </div>
-
-                <!-- Edit Form -->
-                <div id="edit-form" class="hidden">
-                    <form action="{{ route('patient.update-profile') }}" method="POST" class="space-y-4">
-                        @csrf
-                        @method('PUT')
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Name</label>
-                                <input type="text" name="name" value="{{ Auth::user()->name }}" 
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Email</label>
-                                <input type="email" name="email" value="{{ Auth::user()->email }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Phone</label>
-                                <input type="text" name="contact" value="{{ Auth::user()->patient->contact ?? '' }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
-                                <input type="date" name="date_of_birth" value="{{ Auth::user()->patient->date_of_birth ?? '' }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end space-x-2 mt-4">
-                            <button type="button" onclick="toggleEditForm()" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700">
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
+            <!-- Quick Action Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="text-center">
@@ -107,6 +38,127 @@
                 </div>
             </div>
 
+            <!-- Profile Information -->
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mb-6">
+                <!-- Display Information -->
+                <div id="info-display" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-600">Name</p>
+                        <p class="font-medium">{{ Auth::user()->name }}</p>
+                        
+                        <p class="text-sm text-gray-600 mt-4">Email</p>
+                        <p class="font-medium">{{ Auth::user()->email }}</p>
+
+                        <p class="text-sm text-gray-600 mt-4">Role</p>
+                        <p class="font-medium capitalize">{{ Auth::user()->role }}</p>
+
+                        <p class="text-sm text-gray-600 mt-4">Gender</p>
+                        <p class="font-medium capitalize">{{ Auth::user()->gender ?? 'Not set' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Phone</p>
+                        <p class="font-medium">{{ Auth::user()->contact ?? 'Not set' }}</p>
+                        
+                        <p class="text-sm text-gray-600 mt-4">Date of Birth</p>
+                        <p class="font-medium">{{ Auth::user()->date_of_birth ?? 'Not set' }}</p>
+
+                        <p class="text-sm text-gray-600 mt-4">Address</p>
+                        <p class="font-medium">{{ Auth::user()->address ?? 'Not set' }}</p>
+
+                        @if(Auth::user()->role === 'doctor')
+                            <p class="text-sm text-gray-600 mt-4">Specialization</p>
+                            <p class="font-medium">{{ Auth::user()->specialization ?? 'Not set' }}</p>
+
+                            <p class="text-sm text-gray-600 mt-4">License Number</p>
+                            <p class="font-medium">{{ Auth::user()->license_number ?? 'Not set' }}</p>
+
+                            <p class="text-sm text-gray-600 mt-4">Availability</p>
+                            <p class="font-medium">{{ Auth::user()->is_available ? 'Available' : 'Not Available' }}</p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Edit Profile Button -->
+                <div class="mt-6">
+                    <button onclick="toggleEditForm()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        Edit Profile
+                    </button>
+                </div>
+
+                <!-- Edit Form -->
+                <div id="edit-form" class="hidden mt-6">
+                    <form action="{{ route('user.update-profile') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" name="name" value="{{ Auth::user()->name }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" name="email" value="{{ Auth::user()->email }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Phone</label>
+                                <input type="text" name="contact" value="{{ Auth::user()->contact }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                                <input type="date" name="date_of_birth" value="{{ Auth::user()->date_of_birth }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Gender</label>
+                                <select name="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">Select Gender</option>
+                                    <option value="male" {{ Auth::user()->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                    <option value="female" {{ Auth::user()->gender === 'female' ? 'selected' : '' }}>Female</option>
+                                    <option value="other" {{ Auth::user()->gender === 'other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Address</label>
+                                <textarea name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ Auth::user()->address }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="toggleEditForm()" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                @if (session('success'))
+                    <div class="mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-md">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded-md">
+                        {{ session('error') }}
+                    </div>
+                @endif
+            </div>
+
+            <!-- Upcoming Appointments -->
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6 p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Upcoming Appointments</h3>
@@ -147,6 +199,7 @@
                 </div>
             </div>
 
+            <!-- Recent Medical Records -->
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Recent Medical Records</h3>
@@ -200,20 +253,22 @@
             </div>
         </div>
     </div>
-</x-app-layout>
 
-<!-- Add this script at the bottom of your blade file -->
-<script>
-function toggleEditForm() {
-    const displayDiv = document.getElementById('info-display');
-    const editForm = document.getElementById('edit-form');
-    
-    if (displayDiv.classList.contains('hidden')) {
-        displayDiv.classList.remove('hidden');
-        editForm.classList.add('hidden');
-    } else {
-        displayDiv.classList.add('hidden');
-        editForm.classList.remove('hidden');
-    }
-}
-</script>
+    <script>
+        function toggleEditForm() {
+            const infoDisplay = document.getElementById('info-display');
+            const editForm = document.getElementById('edit-form');
+            const editButton = document.querySelector('button[onclick="toggleEditForm()"]');
+
+            if (editForm.classList.contains('hidden')) {
+                infoDisplay.classList.add('hidden');
+                editForm.classList.remove('hidden');
+                editButton.classList.add('hidden');
+            } else {
+                infoDisplay.classList.remove('hidden');
+                editForm.classList.add('hidden');
+                editButton.classList.remove('hidden');
+            }
+        }
+    </script>
+</x-app-layout>

@@ -29,7 +29,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'contact',
+        'date_of_birth',
+        'gender',
+        'address',
+        'role',
+        'specialization',
+        'license_number',
+        'is_available',
     ];
 
     /**
@@ -58,13 +65,14 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $dates = [
+        'date_of_birth'
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_available' => 'boolean',
+    ];
 
     // Relationship with Patient
     public function patient()
@@ -76,5 +84,15 @@ class User extends Authenticatable
     public function doctor()
     {
         return $this->hasOne(Doctor::class);
+    }
+
+    public function isPatient()
+    {
+        return $this->role === 'patient';
+    }
+
+    public function isDoctor()
+    {
+        return $this->role === 'doctor';
     }
 }
