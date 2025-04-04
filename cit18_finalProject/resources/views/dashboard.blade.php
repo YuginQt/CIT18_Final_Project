@@ -8,17 +8,17 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Quick Action Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="text-center">
                         <i class="fas fa-calendar-plus text-4xl text-indigo-600 mb-4"></i>
                         <h3 class="text-lg font-semibold mb-2">Book Appointment</h3>
-                        <button class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <a href="/book-appointment" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                             Schedule Now
-                        </button>
+                        </a>
                     </div>
                 </div>
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                {{-- <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="text-center">
                         <i class="fas fa-comments text-4xl text-green-600 mb-4"></i>
                         <h3 class="text-lg font-semibold mb-2">Message Doctor</h3>
@@ -26,7 +26,7 @@
                             Start Chat
                         </button>
                     </div>
-                </div>
+                </div> --}}
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="text-center">
                         <i class="fas fa-file-medical text-4xl text-blue-600 mb-4"></i>
@@ -159,98 +159,68 @@
             </div>
 
             <!-- Upcoming Appointments -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6 p-6">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Upcoming Appointments</h3>
-                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-900">View All</a>
+                    <a href="{{ route('appointments.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900">View All</a>
                 </div>
+                
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doctor</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4">Dec 24, 2023 10:00 AM</td>
-                                <td class="px-6 py-4">Dr. Smith</td>
-                                <td class="px-6 py-4">Check-up</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Confirmed
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 space-x-2">
-                                    <button class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                        Reschedule
-                                    </button>
-                                    <button class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700">
-                                        Cancel
-                                    </button>
-                                </td>
-                            </tr>
+                        <tbody class="bg-white divide-y divide-gray-200 mb-4">
+                            @forelse($appointments as $appointment)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $appointment->appointment_datetime->format('M d, Y h:i A') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        Dr. {{ $appointment->doctor->name }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap capitalize">
+                                        {{ $appointment->type }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {{ $appointment->status === 'confirmed' ? 'bg-green-100 text-green-800' : '' }}
+                                            {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                            {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
+                                            {{ ucfirst($appointment->status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                        @if($appointment->status !== 'cancelled')
+                                            <button onclick="rescheduleAppointment({{ $appointment->id }})" 
+                                                class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
+                                                Reschedule
+                                            </button>
+                                            <button onclick="cancelAppointment({{ $appointment->id }})" 
+                                                class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
+                                                Cancel
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                        No upcoming appointments
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Recent Medical Records -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Recent Medical Records</h3>
-                    <div class="space-x-2">
-                        <button class="text-sm text-gray-600 hover:text-gray-900">
-                            <i class="fas fa-download mr-1"></i> Download
-                        </button>
-                        <button class="text-sm text-gray-600 hover:text-gray-900">
-                            <i class="fas fa-print mr-1"></i> Print
-                        </button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">Recent Diagnoses</h4>
-                        <ul class="space-y-2">
-                            <li class="flex items-center text-sm">
-                                <i class="fas fa-file-medical text-gray-400 mr-2"></i>
-                                <span>Diagnosis 1 - Date</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">Current Medications</h4>
-                        <ul class="space-y-2">
-                            <li class="flex items-center text-sm">
-                                <i class="fas fa-pills text-gray-400 mr-2"></i>
-                                <span>Medication 1 - Dosage</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">Recent Lab Results</h4>
-                        <ul class="space-y-2">
-                            <li class="flex items-center text-sm">
-                                <i class="fas fa-flask text-gray-400 mr-2"></i>
-                                <span>Lab Test 1 - Date</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">Treatment History</h4>
-                        <ul class="space-y-2">
-                            <li class="flex items-center text-sm">
-                                <i class="fas fa-procedures text-gray-400 mr-2"></i>
-                                <span>Treatment 1 - Date</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 

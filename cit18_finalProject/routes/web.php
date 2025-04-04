@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Modules\User\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
+use App\Modules\Booking\Controllers\BookingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,9 +14,8 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Dashboard route
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // User management routes
     Route::prefix('users')->group(function () {
@@ -25,5 +26,18 @@ Route::middleware([
         Route::put('/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::put('/user/update-profile', [UserController::class, 'updateProfile'])->name('user.update-profile');
+    });
+
+    Route::get('/book-appointment', function () {
+        return view('booking.book-appointment');
+    });
+
+    // Appointment routes
+    Route::prefix('appointments')->group(function () {
+        Route::get('/create', [BookingController::class, 'create'])->name('appointments.create');
+        Route::post('/', [BookingController::class, 'store'])->name('appointments.store');
+        Route::get('/', [BookingController::class, 'index'])->name('appointments.index');
+        Route::put('/{appointment}/reschedule', [BookingController::class, 'reschedule'])->name('appointments.reschedule');
+        Route::put('/{appointment}/cancel', [BookingController::class, 'cancel'])->name('appointments.cancel');
     });
 });
