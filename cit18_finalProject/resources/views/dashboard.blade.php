@@ -165,63 +165,65 @@
                     <h3 class="text-lg font-semibold">Upcoming Appointments</h3>
                 </div>
                 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 mb-4">
-                            @forelse($upcomingAppointments as $appointment)
+                <div class="overflow-y-auto max-h-[400px]">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ $appointment->appointment_datetime->format('M d, Y h:i A') }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ $appointment->user->name }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        Dr. {{ $appointment->doctor->name }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap capitalize">
-                                        {{ $appointment->type }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ $appointment->status === 'confirmed' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                            {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        @if($appointment->user_id === auth()->id() && $appointment->status !== 'cancelled')
-                                            <button onclick="rescheduleAppointment({{ $appointment->id }})" 
-                                                class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
-                                                Reschedule
-                                            </button>
-                                            <button onclick="cancelAppointment({{ $appointment->id }})" 
-                                                class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
-                                                Cancel
-                                            </button>
-                                        @endif
-                                    </td>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Date & Time</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Patient</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Doctor</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">Actions</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                        No appointments found
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse($upcomingAppointments as $appointment)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $appointment->appointment_datetime->format('M d, Y h:i A') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $appointment->user->name }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            Dr. {{ $appointment->doctor->name }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap capitalize">
+                                            {{ $appointment->type }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                {{ $appointment->status === 'confirmed' ? 'bg-green-100 text-green-800' : '' }}
+                                                {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                                {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
+                                                {{ ucfirst($appointment->status) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            @if($appointment->user_id === auth()->id() && $appointment->status !== 'cancelled')
+                                                <button onclick="rescheduleAppointment({{ $appointment->id }})" 
+                                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
+                                                    Reschedule
+                                                </button>
+                                                <button onclick="cancelAppointment({{ $appointment->id }})" 
+                                                    class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded-md">
+                                                    Cancel
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                            No appointments found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -284,6 +286,31 @@
         </div>
     </div>
 
+    <!-- Cancellation Confirmation Modal -->
+    <div id="cancel-modal" 
+         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Cancel Appointment</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Are you sure you want to cancel this appointment? This action cannot be undone.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="confirm-cancel" 
+                            class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Confirm Cancel
+                    </button>
+                    <button onclick="closeCancelModal()" 
+                            class="ml-2 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        No, Keep it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleEditForm() {
             const infoDisplay = document.getElementById('info-display');
@@ -322,6 +349,65 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeAppointmentModal();
+            }
+        });
+
+        function rescheduleAppointment(appointmentId) {
+            window.location.href = `/appointments/${appointmentId}/reschedule`;
+        }
+
+        let appointmentToCancel = null;
+
+        function cancelAppointment(appointmentId) {
+            appointmentToCancel = appointmentId;
+            document.getElementById('cancel-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancel-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            appointmentToCancel = null;
+        }
+
+        // Update the confirm cancel event listener
+        document.getElementById('confirm-cancel').addEventListener('click', function() {
+            if (appointmentToCancel) {
+                fetch(`/appointments/${appointmentToCancel}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Failed to cancel appointment.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while cancelling the appointment.');
+                });
+            }
+            closeCancelModal();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('cancel-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCancelModal();
+            }
+        });
+
+        // Close modal on escape key press
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCancelModal();
             }
         });
     </script>

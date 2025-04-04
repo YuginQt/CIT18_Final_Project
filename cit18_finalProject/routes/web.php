@@ -9,11 +9,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', ])->group(function () {
     // Dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -33,7 +29,10 @@ Route::middleware([
         Route::get('/create', [BookingController::class, 'create'])->name('appointments.create');
         Route::post('/', [BookingController::class, 'store'])->name('appointments.store');
         Route::get('/', [BookingController::class, 'index'])->name('appointments.index');
-        Route::put('/{appointment}/reschedule', [BookingController::class, 'reschedule'])->name('appointments.reschedule');
+        Route::get('/{appointment}/reschedule', [BookingController::class, 'reschedule'])
+            ->name('appointments.reschedule');
+        Route::put('/{appointment}', [BookingController::class, 'update'])
+            ->name('appointments.update');
         Route::put('/{appointment}/cancel', [BookingController::class, 'cancel'])->name('appointments.cancel');
     });
 });

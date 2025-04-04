@@ -10,16 +10,22 @@ class BookingService
 {
     public function createAppointment(array $data)
     {
-        $appointmentDateTime = Carbon::parse($data['appointment_date'] . ' ' . $data['appointment_time']);
-
         return Appointment::create([
-            'patient_id' => auth()->id(),
+            'user_id' => auth()->id(),
             'doctor_id' => $data['doctor_id'],
-            'appointment_datetime' => $appointmentDateTime,
-            'type' => $data['appointment_type'],
+            'appointment_datetime' => $data['appointment_datetime'],
+            'type' => $data['type'],
             'reason' => $data['reason'],
             'notes' => $data['notes'] ?? null,
             'status' => 'pending'
+        ]);
+    }
+
+    public function rescheduleAppointment(Appointment $appointment, string $newDateTime)
+    {
+        return $appointment->update([
+            'appointment_datetime' => $newDateTime,
+            'status' => 'pending' // Reset to pending after rescheduling
         ]);
     }
 
@@ -34,7 +40,11 @@ class BookingService
 
     public function getDoctorAvailability($doctorId)
     {
-        // We can implement this later to get doctor's working days
         return User::findOrFail($doctorId)->is_available;
+    }
+
+    public function cancelAppointment(Appointment $appointment)
+    {
+        return $appointment->update(['status' => 'cancelled']);
     }
 }

@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Modules\Booking\Services\BookingService;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
+use App\Modules\Booking\Requests\BookingRequest;
+use App\Modules\Booking\Requests\RescheduleRequest;
 
 class BookingController extends Controller
 {
@@ -23,24 +25,36 @@ class BookingController extends Controller
         return view('booking.book-appointment', compact('doctors'));
     }
 
-    public function store(Request $request)
+    public function reschedule(Appointment $appointment)
     {
-        $validated = $request->validate([
-            'doctor_id' => 'required|exists:users,id',
-            'appointment_datetime' => 'required|date|after:now',
-            'type' => 'required|string',
-            'reason' => 'required|string',
-            'notes' => 'nullable|string'
+        return view('booking.book-appointment', [
+            'doctors' => User::where('role', 'doctor')->get(),
+            'appointment' => $appointment,
+            'isRescheduling' => true
         ]);
+    }
 
-        $appointmentData = array_merge($validated, [
-            'user_id' => auth()->id(),
-            'status' => 'pending'
-        ]);
-
-        $appointment = Appointment::create($appointmentData);
-
+    public function store(BookingRequest $request)
+    {
+        $this->bookingService->createAppointment($request->validated());
+        
         return redirect()->route('dashboard')
             ->with('success', 'Appointment booked successfully!');
+    }
+
+    public function update(RescheduleRequest $request, Appointment $appointment)
+    {
+        $this->bookingService->rescheduleAppointment($appointment, $request->appointment_datetime);
+        
+        return redirect()->route('dashboard')
+            ->with('success', 'Appointment rescheduled successfully!');
+    }
+
+    public function cancel(Appointment $appointment)
+    {
+        $this->bookingService->cancelAppointment($appointment);
+        
+        return redirect()->route('dashboard')
+            ->with('success', 'Appointment cancelled successfully!');
     }
 }
