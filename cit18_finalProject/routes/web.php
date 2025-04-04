@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PatientController;
+use App\Modules\Patient\Controllers\PatientController;
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('patients', PatientController::class);
@@ -20,4 +20,7 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::put('/patient/update-profile', [PatientController::class, 'updateProfile'])
+        ->name('patient.update-profile');
 });

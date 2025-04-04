@@ -10,23 +10,70 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6 p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Personal Information</h3>
-                    <button class="text-sm text-indigo-600 hover:text-indigo-900">
+                    <button onclick="toggleEditForm()" class="text-sm text-indigo-600 hover:text-indigo-900">
                         <i class="fas fa-edit mr-1"></i> Edit Profile
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Display Information -->
+                <div id="info-display" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <p class="text-sm text-gray-600">Name</p>
-                        <p class="font-medium">John Doe</p>
+                        <p class="font-medium">{{ Auth::user()->name }}</p>
                         <p class="text-sm text-gray-600 mt-2">Email</p>
-                        <p class="font-medium">john@example.com</p>
+                        <p class="font-medium">{{ Auth::user()->email }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Phone</p>
-                        <p class="font-medium">+1 234 567 8900</p>
+                        <p class="font-medium">{{ Auth::user()->patient->contact ?? 'Not set' }}</p>
                         <p class="text-sm text-gray-600 mt-2">Date of Birth</p>
-                        <p class="font-medium">January 1, 1990</p>
+                        <p class="font-medium">{{ Auth::user()->patient->date_of_birth ?? 'Not set' }}</p>
                     </div>
+                </div>
+
+                <!-- Edit Form -->
+                <div id="edit-form" class="hidden">
+                    <form action="{{ route('patient.update-profile') }}" method="POST" class="space-y-4">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" name="name" value="{{ Auth::user()->name }}" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" name="email" value="{{ Auth::user()->email }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Phone</label>
+                                <input type="text" name="contact" value="{{ Auth::user()->patient->contact ?? '' }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                                <input type="date" name="date_of_birth" value="{{ Auth::user()->patient->date_of_birth ?? '' }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button type="button" onclick="toggleEditForm()" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -154,3 +201,19 @@
         </div>
     </div>
 </x-app-layout>
+
+<!-- Add this script at the bottom of your blade file -->
+<script>
+function toggleEditForm() {
+    const displayDiv = document.getElementById('info-display');
+    const editForm = document.getElementById('edit-form');
+    
+    if (displayDiv.classList.contains('hidden')) {
+        displayDiv.classList.remove('hidden');
+        editForm.classList.add('hidden');
+    } else {
+        displayDiv.classList.add('hidden');
+        editForm.classList.remove('hidden');
+    }
+}
+</script>

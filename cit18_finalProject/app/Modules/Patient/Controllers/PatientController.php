@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Patient\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -81,6 +84,31 @@ class PatientController extends Controller
     $patient->delete();
 
     return redirect()->route('patients.index')->with('success', 'Patient deleted successfully.');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
+            'contact' => ['nullable', 'string', 'max:255'],
+            'date_of_birth' => ['nullable', 'date'],
+        ]);
+
+        // Update user
+        $user = auth()->user();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        // Update patient
+        $user->patient()->update([
+            'contact' => $request->contact,
+            'date_of_birth' => $request->date_of_birth,
+        ]);
+
+        return back()->with('success', 'Profile updated successfully!');
     }
 
 }

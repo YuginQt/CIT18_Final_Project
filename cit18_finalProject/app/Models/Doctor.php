@@ -4,18 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Patient extends Model
+class Doctor extends Model
 {
     protected $fillable = [
         'user_id',
-        'age',
-        'gender',
-        'contact',
-        'address',
-        'date_of_birth'
+        'specialization',
+        'license_number',
+        'is_available'
     ];
-
-    // Relationship with User
     public function user()
     {
         return $this->belongsTo(User::class);

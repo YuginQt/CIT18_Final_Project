@@ -29,6 +29,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
 
     /**
@@ -63,5 +64,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationship with Patient
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
+    }
+
+    // Relationship with Doctor
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);
     }
 }
