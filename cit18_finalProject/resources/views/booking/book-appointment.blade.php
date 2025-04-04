@@ -14,56 +14,59 @@
                   <!-- Doctor Selection -->
                   <div class="mb-6">
                       <label class="block text-sm font-medium text-gray-700 mb-2">Select Doctor</label>
-                      <select name="doctor_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                      <select name="doctor_id" required 
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('doctor_id') border-red-500 @enderror">
                           <option value="">Choose a doctor</option>
                           @foreach($doctors as $doctor)
-                              <option value="{{ $doctor->id }}">
+                              <option value="{{ $doctor->id }}" {{ old('doctor_id') == $doctor->id ? 'selected' : '' }}>
                                   Dr. {{ $doctor->name }} - {{ $doctor->specialization }}
                               </option>
                           @endforeach
                       </select>
+                      @error('doctor_id')
+                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                      @enderror
                   </div>
 
-                  <!-- Appointment Date -->
+                  <!-- Appointment Date and Time (Combined) -->
                   <div class="mb-6">
-                      <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Date</label>
-                      <input type="date" name="appointment_date" 
-                          min="{{ date('Y-m-d') }}"
-                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                  </div>
-
-                  <!-- Appointment Time -->
-                  <div class="mb-6">
-                      <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
-                      <select name="appointment_time" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                          <option value="">Select time</option>
-                          <option value="09:00">9:00 AM</option>
-                          <option value="10:00">10:00 AM</option>
-                          <option value="11:00">11:00 AM</option>
-                          <option value="14:00">2:00 PM</option>
-                          <option value="15:00">3:00 PM</option>
-                          <option value="16:00">4:00 PM</option>
-                      </select>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Date and Time</label>
+                      <input type="datetime-local" 
+                          name="appointment_datetime" 
+                          min="{{ date('Y-m-d\TH:i') }}"
+                          value="{{ old('appointment_datetime') }}"
+                          required
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('appointment_datetime') border-red-500 @enderror">
+                      @error('appointment_datetime')
+                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                      @enderror
                   </div>
 
                   <!-- Appointment Type -->
                   <div class="mb-6">
                       <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Type</label>
-                      <select name="appointment_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                      <select name="type" required
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('type') border-red-500 @enderror">
                           <option value="">Select type</option>
-                          <option value="consultation">Consultation</option>
-                          <option value="follow_up">Follow-up</option>
-                          <option value="check_up">Regular Check-up</option>
-                          <option value="emergency">Emergency</option>
+                          <option value="consultation" {{ old('type') == 'consultation' ? 'selected' : '' }}>Consultation</option>
+                          <option value="follow_up" {{ old('type') == 'follow_up' ? 'selected' : '' }}>Follow-up</option>
+                          <option value="check_up" {{ old('type') == 'check_up' ? 'selected' : '' }}>Regular Check-up</option>
+                          <option value="emergency" {{ old('type') == 'emergency' ? 'selected' : '' }}>Emergency</option>
                       </select>
+                      @error('type')
+                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                      @enderror
                   </div>
 
                   <!-- Reason for Visit -->
                   <div class="mb-6">
                       <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Visit</label>
-                      <textarea name="reason" rows="3" 
-                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                          placeholder="Please describe your symptoms or reason for visit"></textarea>
+                      <textarea name="reason" rows="3" required
+                          class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('reason') border-red-500 @enderror"
+                          placeholder="Please describe your symptoms or reason for visit">{{ old('reason') }}</textarea>
+                      @error('reason')
+                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                      @enderror
                   </div>
 
                   <!-- Additional Notes -->
@@ -71,21 +74,8 @@
                       <label class="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
                       <textarea name="notes" rows="2" 
                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                          placeholder="Any additional information you'd like to share"></textarea>
+                          placeholder="Any additional information you'd like to share">{{ old('notes') }}</textarea>
                   </div>
-
-                  <!-- Error Messages -->
-                  @if ($errors->any())
-                      <div class="mb-6">
-                          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                              <ul class="list-disc list-inside">
-                                  @foreach ($errors->all() as $error)
-                                      <li>{{ $error }}</li>
-                                  @endforeach
-                              </ul>
-                          </div>
-                      </div>
-                  @endif
 
                   <!-- Submit Buttons -->
                   <div class="flex justify-end space-x-2">

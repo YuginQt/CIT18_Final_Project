@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Appointment;
 
 class User extends Authenticatable
 {
@@ -82,5 +83,13 @@ class User extends Authenticatable
     public function isDoctor()
     {
         return $this->role === 'doctor';
+    }
+
+    /**
+     * Get the appointments for the user.
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

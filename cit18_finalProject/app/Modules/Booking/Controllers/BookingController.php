@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\Booking\Services\BookingService;
 use Illuminate\Http\Request;
+use App\Models\Appointment;
 
 class BookingController extends Controller
 {
@@ -26,14 +27,20 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'doctor_id' => 'required|exists:users,id',
-            'appointment_date' => 'required|date|after_or_equal:today',
-            'appointment_time' => 'required',
-            'appointment_type' => 'required|in:consultation,follow_up,check_up,emergency',
-            'reason' => 'required|string|max:500',
-            'notes' => 'nullable|string|max:500'
+            'appointment_datetime' => 'required|date|after:now',
+            'type' => 'required|string',
+            'reason' => 'required|string',
+            'notes' => 'nullable|string'
         ]);
 
-        $this->bookingService->createAppointment($validated);
-        return redirect()->route('dashboard')->with('success', 'Appointment booked successfully!');
+        $appointmentData = array_merge($validated, [
+            'user_id' => auth()->id(),
+            'status' => 'pending'
+        ]);
+
+        $appointment = Appointment::create($appointmentData);
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Appointment booked successfully!');
     }
 }

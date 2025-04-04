@@ -8,27 +8,41 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Appointment extends Model
 {
     protected $fillable = [
-        'patient_id',
+        'user_id',
         'doctor_id',
         'appointment_datetime',
         'type',
         'reason',
-        'notes',
-        'status'
+        'status',
+        'notes'
     ];
 
     protected $casts = [
         'appointment_datetime' => 'datetime'
     ];
 
-    // Define relationship with User model for patient
-    public function patient(): BelongsTo
+    /**
+     * Scope a query to only include upcoming appointments.
+     */
+    public function scopeUpcoming($query)
     {
-        return $this->belongsTo(User::class, 'patient_id');
+        return $query->where('appointment_datetime', '>=', now())
+                    ->where('status', '!=', 'cancelled')
+                    ->orderBy('appointment_datetime');
     }
 
-    // Define relationship with User model for doctor
-    public function doctor(): BelongsTo
+    /**
+     * Get the user that owns the appointment.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the doctor for the appointment.
+     */
+    public function doctor()
     {
         return $this->belongsTo(User::class, 'doctor_id');
     }

@@ -30,9 +30,10 @@
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="text-center">
                         <i class="fas fa-file-medical text-4xl text-blue-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">Medical Records</h3>
-                        <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            View Records
+                        <h3 class="text-lg font-semibold mb-2">Appointment History</h3>
+                        <button onclick="openAppointmentModal()" 
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            View History
                         </button>
                     </div>
                 </div>
@@ -169,6 +170,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -176,10 +178,13 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 mb-4">
-                            @forelse($appointments as $appointment)
+                            @forelse($upcomingAppointments as $appointment)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {{ $appointment->appointment_datetime->format('M d, Y h:i A') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {{ $appointment->user->name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         Dr. {{ $appointment->doctor->name }}
@@ -196,7 +201,7 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        @if($appointment->status !== 'cancelled')
+                                        @if($appointment->user_id === auth()->id() && $appointment->status !== 'cancelled')
                                             <button onclick="rescheduleAppointment({{ $appointment->id }})" 
                                                 class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 px-3 py-1 rounded-md">
                                                 Reschedule
@@ -210,8 +215,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                        No upcoming appointments
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                        No appointments found
                                     </td>
                                 </tr>
                             @endforelse
@@ -220,6 +225,62 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Appointment History Modal -->
+    <div id="appointment-modal" 
+         class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-900">Appointment History</h3>
+                <button onclick="closeAppointmentModal()" 
+                        class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doctor</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($appointments ?? [] as $appointment)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ $appointment->appointment_datetime->format('M d, Y h:i A') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    Dr. {{ $appointment->doctor->name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {{ $appointment->status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                           ($appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : 
+                                           'bg-yellow-100 text-yellow-800') }}">
+                                        {{ ucfirst($appointment->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ $appointment->notes ?? 'No notes available' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                    No appointments found
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -239,5 +300,29 @@
                 editButton.classList.remove('hidden');
             }
         }
+
+        function openAppointmentModal() {
+            document.getElementById('appointment-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAppointmentModal() {
+            document.getElementById('appointment-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('appointment-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAppointmentModal();
+            }
+        });
+
+        // Close modal on escape key press
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAppointmentModal();
+            }
+        });
     </script>
 </x-app-layout>
