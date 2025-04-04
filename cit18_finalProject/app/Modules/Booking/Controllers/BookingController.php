@@ -52,41 +52,28 @@ class BookingController extends Controller
 
     public function cancel(Appointment $appointment)
     {
-        try {
-            $this->bookingService->cancelAppointment($appointment);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment cancelled successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to cancel appointment'
-            ], 500);
-        }
+        $this->bookingService->cancelAppointment($appointment);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment cancelled successfully'
+        ]);
     }
 
     public function approve(Appointment $appointment)
     {
-        // Check if the user is a doctor
-        if (auth()->user()->role !== 'doctor') {
+        if (auth()->user()->role !== 'doctor' || $appointment->doctor_id !== auth()->id()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized action'
             ], 403);
         }
 
-        // Check if the appointment belongs to this doctor
-        if ($appointment->doctor_id !== auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized action'
-            ], 403);
-        }
-
-        $result = $this->bookingService->approveAppointment($appointment);
+        $this->bookingService->approveAppointment($appointment);
         
-        return response()->json($result);
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment approved successfully'
+        ]);
     }
 }

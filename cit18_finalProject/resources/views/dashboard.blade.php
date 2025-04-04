@@ -378,14 +378,12 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Close modal when clicking outside
         document.getElementById('appointment-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAppointmentModal();
             }
         });
 
-        // Close modal on escape key press
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeAppointmentModal();
@@ -410,7 +408,6 @@
             appointmentToCancel = null;
         }
 
-        // Update the confirm cancel event listener
         document.getElementById('confirm-cancel').addEventListener('click', function() {
             if (appointmentToCancel) {
                 fetch(`/appointments/${appointmentToCancel}/cancel`, {
@@ -446,14 +443,12 @@
             closeCancelModal();
         });
 
-        // Close modal when clicking outside
         document.getElementById('cancel-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeCancelModal();
             }
         });
 
-        // Close modal on escape key press
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCancelModal();
@@ -471,17 +466,14 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Add event listener for the close button
         document.getElementById('error-modal-close').addEventListener('click', closeErrorModal);
 
-        // Close modal when clicking outside
         document.getElementById('error-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeErrorModal();
             }
         });
 
-        // Close modal on escape key press
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeErrorModal();
@@ -502,7 +494,6 @@
             appointmentToApprove = null;
         }
 
-        // Add event listeners for the confirm modal
         document.getElementById('confirm-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeConfirmModal();
@@ -562,7 +553,7 @@
                 position: "right",
                 backgroundColor: "{{ session('success') ? '#10B981' : '#EF4444' }}",
                 stopOnFocus: true,
-                onClick: function(){} // Prevents errors if accidentally clicked
+                onClick: function(){}
             }).showToast();
         </script>
     @endif

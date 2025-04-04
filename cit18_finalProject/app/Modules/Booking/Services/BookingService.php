@@ -25,13 +25,12 @@ class BookingService
     {
         return $appointment->update([
             'appointment_datetime' => $newDateTime,
-            'status' => 'pending' // Reset to pending after rescheduling
+            'status' => 'pending' 
         ]);
     }
 
     public function getAvailableTimeSlots($doctorId, $date)
     {
-        // We can implement this later to check doctor's availability
         return [
             '09:00', '10:00', '11:00',
             '14:00', '15:00', '16:00'
@@ -45,31 +44,17 @@ class BookingService
 
     public function cancelAppointment(Appointment $appointment)
     {
-        try {
-            $appointment->update(['status' => 'cancelled']);
-            
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $appointment->update(['status' => 'cancelled']);
+        return true;
     }
 
     public function approveAppointment(Appointment $appointment)
     {
-        try {
-            $appointment->update([
-                'status' => 'confirmed'
-            ]);
-            
-            return [
-                'success' => true,
-                'message' => 'Appointment approved successfully'
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Failed to approve appointment'
-            ];
-        }
+        $appointment->update(['status' => 'confirmed']);
+        
+        return [
+            'success' => true,
+            'message' => 'Appointment approved successfully'
+        ];
     }
 }
